@@ -227,7 +227,7 @@
       display: none;
       flex-wrap: wrap;
       gap: 15px;
-      background: white;
+      background: #fff;
       border-radius: 15px;
       padding: 15px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -325,6 +325,23 @@
         height: 60px;
       }
     }
+    
+    .chat-input textarea {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #fff;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+  height: auto;
+  min-height: calc(1.5em * 6); /* Минимальная высота для 6 строк */
+  max-height: calc(1.5em * 8); /* Максимальная высота для 8 строк */
+  resize: none; /* Отключаем возможность ручного изменения размера */
+  overflow-y: auto; /* Добавляем скролл, если превышен максимум */
+}
   </style>
 </head>
 <body>
@@ -390,93 +407,64 @@
       <button class="attach-btn" id="attach-btn">&#128206;</button>
       <textarea id="chat-input" placeholder="Напишите сообщение..."></textarea>
       <button id="send-button">&#9658;</button>
-    </div>
-  </div>
-
-  <script>
-    const attachButton = document.getElementById('attach-btn');
-    const attachMenu = document.getElementById('attachment-menu');
-
-    attachButton.addEventListener('click', () => {
-      attachMenu.style.display = attachMenu.style.display === 'block' ? 'none' : 'block';
-    });
-
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-button');
-
-    function sendMessage() {
-      const messageText = chatInput.value.trim();
-      if (messageText) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', 'me');
-        messageDiv.textContent = messageText;
-
-        messageDiv.addEventListener('click', () => {
-          if (confirm('Удалить это сообщение?')) {
-            messageDiv.remove();
-          }
-        });
-
-        chatMessages.appendChild(messageDiv);
-        chatInput.value = '';
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-    }
-
-    sendButton.addEventListener('click', sendMessage);
-
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
-    
+      
+<script>
   const attachButton = document.getElementById('attach-btn');
-  const attachMenu = document.getElementById('attachment-menu');
+const attachMenu = document.getElementById('attachment-menu');
+const chatMessages = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input'); // Оставляем только одно объявление переменной
+const sendButton = document.getElementById('send-button');
 
-  attachButton.addEventListener('click', () => {
-    attachMenu.style.display = attachMenu.style.display === 'block' ? 'none' : 'block';
-  });
+attachButton.addEventListener('click', () => {
+  attachMenu.style.display = attachMenu.style.display === 'block' ? 'none' : 'block';
+});
 
-  const chatMessages = document.getElementById('chat-messages');
-  const chatInput = document.getElementById('chat-input');
-  const sendButton = document.getElementById('send-button');
+function sendMessage() {
+  const messageText = chatInput.value.trim();
+  if (messageText) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', 'me');
+    messageDiv.textContent = messageText;
 
-  function sendMessage() {
-    const messageText = chatInput.value.trim();
-    if (messageText) {
-      const messageDiv = document.createElement('div');
-      messageDiv.classList.add('message', 'me');
-      messageDiv.textContent = messageText;
+    messageDiv.addEventListener('click', () => {
+      if (confirm('Удалить это сообщение?')) {
+        messageDiv.remove();
+      }
+    });
 
-      messageDiv.addEventListener('click', () => {
-        if (confirm('Удалить это сообщение?')) {
-          messageDiv.remove();
-        }
-      });
-
-      chatMessages.appendChild(messageDiv);
-      chatInput.value = '';
-      chatInput.style.height = 'auto'; // Сбрасываем высоту после отправки сообщения
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    chatMessages.appendChild(messageDiv);
+    chatInput.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   }
+}
 
-  sendButton.addEventListener('click', sendMessage);
+sendButton.addEventListener('click', sendMessage);
 
-  chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); // Предотвращаем разрыв строки
-      sendMessage();
-    }
-  });
+chatInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault(); // Чтобы Enter не добавлял новую строку
+    sendMessage();
+  }
+});
 
-  chatInput.addEventListener('input', () => {
-    chatInput.style.height = 'auto'; // Сбрасываем высоту перед пересчетом
-    const maxHeight = parseInt(window.getComputedStyle(chatInput).lineHeight) * 8; // Максимум 8 строк
+chatInput.addEventListener('input', () => {
+  // Сбрасываем текущую высоту
+  chatInput.style.height = 'auto';
+  
+  // Получаем максимальную и минимальную высоту для 6 и 8 строк
+  const lineHeight = parseInt(window.getComputedStyle(chatInput).lineHeight);
+  const maxHeight = lineHeight * 8; // Максимальная высота для 8 строк
+  const minHeight = lineHeight * 6; // Минимальная высота для 6 строк
+  
+  // Если текст есть, устанавливаем высоту на основе scrollHeight, но не больше maxHeight
+  if (chatInput.value) {
     chatInput.style.height = Math.min(chatInput.scrollHeight, maxHeight) + 'px';
-  });
-  </script>
+  } else {
+    // Если поле пустое, восстанавливаем минимальную высоту
+    chatInput.style.height = minHeight + 'px';
+  }
+});
+</script>
+
 </body>
 </html>
