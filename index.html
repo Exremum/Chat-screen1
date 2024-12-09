@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Иконка сайта -->
+    <link rel="icon" href="src/chat.png">
+
+  <title>Chat-screen</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #e4e9f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(45deg, #8bb3a0, #ad70b9);
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 420px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chat-header {
+      background: #4caf50;
+      color: white;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-header .back-arrow {
+      font-size: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .chat-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .chat-header-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .chat-header-info .name {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .chat-header-info .status {
+      font-size: 12px;
+      color: #d4f4d4;
+    }
+
+    .chat-header .icons {
+      display: flex;
+      gap: 19px;
+    }
+
+    .chat-header .icons i {
+      font-size: 18px;
+      cursor: pointer;
+      color: white;
+      transition: color 0.3s ease;
+    }
+
+    .chat-header .icons i:hover {
+      color: #c8e6c9;
+    }
+
+    .chat-header .menu {
+      position: relative;
+      display: inline-block;
+    }
+
+    .menu-items {
+      display: none;
+      position: absolute;
+      top: 25px;
+      right: 0;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      width: 150px;
+    }
+
+    .menu-items div {
+      padding: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: black;
+    }
+
+    .menu-items div:hover {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .menu:hover .menu-items {
+      display: block;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px 15px;
+      background-color: #a4b3bb31;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 10px 15px;
+      font-size: 14px;
+      line-height: 1.5;
+      border-radius: 18px;
+      word-wrap: break-word;
+      animation: fadeIn 0.3s ease-out;
+      cursor: pointer;
+    }
+
+    .message.me {
+      align-self: flex-end;
+      background: #dcf8c6;
+      color: #303030;
+    }
+
+    .message.other {
+      align-self: flex-start;
+      background: white;
+      color: #606060;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-input {
+      display: flex;
+      align-items: flex-start;
+      padding: 10px;
+      background: white;
+      border-top: 1px solid #ddd;
+      box-sizing: border-box;
+      height: 60px;
+    }
+
+    .chat-input textarea {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      font-size: 14px;
+      outline: none;
+      background: #f9f9f9;
+      margin-right: 10px;
+      transition: all 0.3s ease;
+      height: auto; /* Автоматическая высота */
+      min-height: 36px;
+      resize: none; /* Убираем стрелки */
+      box-sizing: border-box;
+      appearance: none; /* Для всех браузеров */
+      -webkit-appearance: none; /* Для WebKit-браузеров */
+      -moz-appearance: none; /* Для Firefox */
+      overflow: hidden; /* Скрыть скролл, если появится */
+    }
+
+    .chat-input .attach-btn {
+      background: none;
+      border: none;
+      color: #4caf50;
+      font-size: 20px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .chat-input .attach-btn:hover {
+      color: #388e3c;
+    }
+
+    .chat-input button {
+      width: 45px;
+      height: 45px;
+      border: none;
+      background: #4caf50;
+      color: rgb(255, 255, 255);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: background 0.3s ease;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .chat-input button:hover {
+      background: #388e3c;
+    }
+
+    /* Стили для меню прикрепления */
+    .attachment-menu {
+      position: absolute;
+      bottom: 70px;
+      left: 10px;
+      display: none;
+      flex-wrap: wrap;
+      gap: 15px;
+      background: white;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .attachment-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background: #f9f9f9;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      font-size: 14px;
+      color: #606060;
+      text-align: center;
+    }
+
+    .attachment-item img {
+      width: 30px;
+      height: 30px;
+    }
+
+    .attachment-item span {
+      margin-top: 5px;
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .attachment-item:hover {
+      background: #4caf50;
+      color: white;
+      transform: scale(1.1);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Мобильные стили */
+    @media (max-width: 600px) {
+      .chat-container {
+        max-width: 100%;
+        height: 100vh;
+      }
+
+      .chat-header {
+        padding: 10px;
+      }
+
+      .chat-header .back-arrow {
+        font-size: 18px;
+      }
+
+      .chat-header-info .name {
+        font-size: 14px;
+      }
+
+      .chat-header-info .status {
+        font-size: 10px;
+      }
+
+      .chat-messages {
+        padding: 10px;
+      }
+
+      .chat-input {
+        height: 60px; /* Увеличиваем для мобильных устройств */
+      }
+
+      .chat-input textarea {
+        height: 36px;
+        min-height: 36px;
+      }
+    }
+
+    /* Десктопные стили */
+    @media (min-width: 1024px) {
+      .chat-input textarea {
+        height: 36px;
+        min-height: 36px;
+      }
+
+      .chat-input {
+        height: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <span class="back-arrow">&#8592;</span>
+      <img src="src/ico.png" alt="Avatar">
+      <div class="chat-header-info">
+        <div class="name">Александр Иванов</div>
+        <div class="status">В сети</div>
+      </div>
+      <div class="icons">
+        <i class="fas fa-video"></i>
+        <i class="fas fa-phone-alt"></i>
+        <div class="menu">
+          <i class="fas fa-ellipsis-v"></i>
+          <div class="menu-items">
+            <div>Просмотр контакта</div>
+            <div>Поиск</div>
+            <div>Добавить в список</div>
+            <div>Без звука</div>
+            <div>Еще</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+      <div class="message other">Привет! Как дела?</div>
+      <div class="message me">Привет! Всё отлично, а у тебя?</div>
+      <div class="message other">Тоже всё хорошо!</div>
+    </div>
+
+    <!-- Меню прикрепления (скрепка) -->
+    <div class="attachment-menu" id="attachment-menu">
+      <div class="attachment-item">
+        <img src="src/gal.png" alt="Gallery">
+        <span>Галерея</span>
+      </div>
+      <div class="attachment-item">
+        <img src="src/cam.png" alt="Camera">
+        <span>Камера</span>
+      </div>
+      <div class="attachment-item">
+        <img src="src/docu.png" alt="Document">
+        <span>Документ</span>
+      </div>
+      <div class="attachment-item">
+        <img src="src/loca.png" alt="Location">
+        <span>Локация</span>
+      </div>
+      <div class="attachment-item">
+        <img src="src/conta.png" alt="Contact">
+        <span>Контакт</span>
+      </div>
+      <div class="attachment-item">
+        <img src="src/opros.png" alt="Poll">
+        <span>Опрос</span>
+      </div>
+    </div>
+
+    <div class="chat-input">
+      <button class="attach-btn" id="attach-btn">&#128206;</button>
+      <textarea id="chat-input" placeholder="Напишите сообщение..."></textarea>
+      <button id="send-button">&#9658;</button>
+    </div>
+  </div>
+
+  <script>
+    const attachButton = document.getElementById('attach-btn');
+    const attachMenu = document.getElementById('attachment-menu');
+
+    attachButton.addEventListener('click', () => {
+      attachMenu.style.display = attachMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+
+    function sendMessage() {
+      const messageText = chatInput.value.trim();
+      if (messageText) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', 'me');
+        messageDiv.textContent = messageText;
+
+        messageDiv.addEventListener('click', () => {
+          if (confirm('Удалить это сообщение?')) {
+            messageDiv.remove();
+          }
+        });
+
+        chatMessages.appendChild(messageDiv);
+        chatInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
