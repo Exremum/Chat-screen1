@@ -431,6 +431,52 @@
         sendMessage();
       }
     });
+    
+  const attachButton = document.getElementById('attach-btn');
+  const attachMenu = document.getElementById('attachment-menu');
+
+  attachButton.addEventListener('click', () => {
+    attachMenu.style.display = attachMenu.style.display === 'block' ? 'none' : 'block';
+  });
+
+  const chatMessages = document.getElementById('chat-messages');
+  const chatInput = document.getElementById('chat-input');
+  const sendButton = document.getElementById('send-button');
+
+  function sendMessage() {
+    const messageText = chatInput.value.trim();
+    if (messageText) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', 'me');
+      messageDiv.textContent = messageText;
+
+      messageDiv.addEventListener('click', () => {
+        if (confirm('Удалить это сообщение?')) {
+          messageDiv.remove();
+        }
+      });
+
+      chatMessages.appendChild(messageDiv);
+      chatInput.value = '';
+      chatInput.style.height = 'auto'; // Сбрасываем высоту после отправки сообщения
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }
+
+  sendButton.addEventListener('click', sendMessage);
+
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // Предотвращаем разрыв строки
+      sendMessage();
+    }
+  });
+
+  chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto'; // Сбрасываем высоту перед пересчетом
+    const maxHeight = parseInt(window.getComputedStyle(chatInput).lineHeight) * 8; // Максимум 8 строк
+    chatInput.style.height = Math.min(chatInput.scrollHeight, maxHeight) + 'px';
+  });
   </script>
 </body>
 </html>
